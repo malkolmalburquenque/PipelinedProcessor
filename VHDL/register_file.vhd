@@ -34,8 +34,8 @@ BEGIN
 			rb_data <= register_store(to_integer(unsigned(rt)));
 			IF (write_enable = '1') THEN -- if write_enable is high, we have permission to update the data of rd
 				register_store(to_integer(unsigned(rd))) <= rd_data; -- access the appropriate register in the register_store, and assign it rd_data
-			END IF
-		END IF
-	END PROCESS
+			END IF;
+		END IF;
+	END PROCESS;
 
 END Behav;
