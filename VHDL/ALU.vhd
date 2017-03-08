@@ -16,21 +16,21 @@ begin
 case SEL is
  
  when "00000" =>  
- out_alu<= input_a + input_b; --add 
+ out_alu<= input_a + input_b; --ADD
  
  when "00001" => 
- out_alu<= input_a - input_b; --sub 
+ out_alu<= input_a - input_b; --SUB 
  
  when "00010" => 
  
  when "00011" => 
- out_alu<= input_a * input_b; --mult
+ out_alu<= input_a * input_b; --MULT
  
  when "00100" =>  
- out_alu<= input_a/input_b;   --div
+ out_alu<= input_a/input_b;   --DIV
 
  when "00101" =>  
- if (input_a < input_b) then
+ if (input_a < input_b) then  --SLT
 	out_alu <= 1;
 	else
 	out_alu <= 0;
@@ -63,8 +63,10 @@ case SEL is
  when "10000" =>
  
  when "10001" =>
+ out_alu<= input_a sll to_integer(unsigned(input_b(10 downto 6))); --sll
  
  when "10010" =>
+ out_alu<= input_a srl to_integer(unsigned(input_b(10 downto 6))); --srl
  
  when "10011" =>
  
@@ -75,7 +77,6 @@ case SEL is
  when "10110" =>
  
  when "10111" =>
- 
  
  when "11000" =>
  
