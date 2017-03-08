@@ -19,7 +19,7 @@ BEGIN
         IF (clock'event AND clock = '1') THEN
             immediate_out(31 downto 16) <= "0000000000000000";
             immediate_out(15 downto 0) <= immediate_in;
-        END IF
-    END PROCESS
+        END IF;
+    END PROCESS;
 
 END Behavioral;
