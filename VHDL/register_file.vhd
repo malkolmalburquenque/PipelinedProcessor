@@ -24,7 +24,7 @@ END register_file;
 ARCHITECTURE Behav OF register_file IS
 
 TYPE registers IS ARRAY (0 to 31) OF STD_LOGIC_VECTOR(31 downto 0); -- MIPS has 32 registers. Size of data is 32 bits. => 32x32bits
-SIGNAL register_store: registers := (OTHERS=> X"00000000"); -- initialize all registers to 32 bits of 0.
+SIGNAL register_store: registers := (OTHERS=> "00000000000000000000000000000000"); -- initialize all registers to 32 bits of 0.
 
 BEGIN
 	PROCESS (clock)
@@ -33,7 +33,11 @@ BEGIN
 			ra_data <= register_store(to_integer(unsigned(rs))); -- data of ra is now the data associated with rs's register index in the register_store
 			rb_data <= register_store(to_integer(unsigned(rt)));
 			IF (write_enable = '1') THEN -- if write_enable is high, we have permission to update the data of rd
-				register_store(to_integer(unsigned(rd))) <= rd_data; -- access the appropriate register in the register_store, and assign it rd_data
+				IF (to_integer(unsigned(rd)) = 0) THEN -- if we are trying to write to R0, then deny the write
+					NULL;
+				ELSE
+					register_store(to_integer(unsigned(rd))) <= rd_data; -- access the appropriate register in the register_store, and assign it rd_data
+				END IF;
 			END IF;
 		END IF;
 	END PROCESS;
