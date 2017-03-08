@@ -5,12 +5,12 @@ USE ieee.numeric_std.all;
 ENTITY signextender IS
     PORT (
         clock: IN STD_LOGIC;
-        immediate_in: IN STD_LOGIC_VECTOR (15 DOWNTO 0); 
-        immediate_out: OUT STD_LOGIC_VECTOR (31 DOWNTO 0); 
-    );  
+        immediate_in: IN STD_LOGIC_VECTOR (15 DOWNTO 0);
+        immediate_out: OUT STD_LOGIC_VECTOR (31 DOWNTO 0)
+    );
 END signextender;
 
-ARCHITECTURE structure OF signextender IS
+ARCHITECTURE Behavioral OF signextender IS
 
 BEGIN
 
@@ -22,4 +22,4 @@ BEGIN
         END IF
     END PROCESS
 
-END structure
+END Behavioral;
