@@ -5,13 +5,14 @@ use IEEE.numeric_std.all;
 entity controller is
 port(clk : in std_logic;
 	 opcode : in std_logic_vector(5 downto 0);
+	 funct : in std_logic_vector(5 downto 0);
 	 ALU1src : out STD_LOGIC;
 	 ALU2src : out STD_LOGIC;
 	 MemRead : out STD_LOGIC;
 	 MemWrite : out STD_LOGIC;
 	 RegWrite : out STD_LOGIC;
 	 MemToReg : out STD_LOGIC;
-	 ALUOp : out STD_LOGIC_VECOTR(4 downto 0);
+	 ALUOp : out STD_LOGIC_VECTOR(4 downto 0)
 	 );
 	 
 end controller;
@@ -25,279 +26,225 @@ begin
 	
 	case opcode is
 	
-	-- SLL   PADED BY SIGN EXTEND TO DO
-	when x"00" =>
-	if(funct == x"00"){
+	-- SLL   PADED BY SIGN EXTEND TO DO   OUTPUT 17
+	when "000000" =>
+	if funct = "000000" then 
 	ALU1src <= '0';
 	ALU2src <= '0';
 	MemRead <= '0';
 	MemWrite <= '0';
 	RegWrite <= '1';
 	MemToReg <= '0';
-	ALUOp <= "000017";
-	}
-	-- DIVIDING 
-	else if (funct == x"1a"){
-	ALU1src <= '0';
-	ALU2src <= '1';
-	MemRead <= '0';
-	MemWrite <= '0';
-	RegWrite <= '1';
-	MemToReg <= '0';
-	ALUOp <= "000017";
-	}
-	-- MULTI
-	else if (funct == x"18"){
-	ALU1src <= '0';
-	ALU2src <= '1';
-	MemRead <= '0';
-	MemWrite <= '0';
-	RegWrite <= '1';
-	MemToReg <= '0';
-	ALUOp <= "000017";
-	}
-	--SRA
-	else if (funct == x"03"){
-	ALU1src <= '0';
-	ALU2src <= '0';
-	MemRead <= '0';
-	MemWrite <= '0';
-	RegWrite <= '1';
-	MemToReg <= '0';
-	ALUOp <= "000017";
-	}
-	-- TO DO HIGH
-	else if (funct == x"10"){
-	ALU1src <= '0';
-	ALU2src <= '1';
-	MemRead <= '0';
-	MemWrite <= '0';
-	RegWrite <= '1';
-	MemToReg <= '0';
-	ALUOp <= "000017";
-	}
-	--TO DO LOW 
-	else if (funct == x"12"){
-	ALU1src <= '0';
-	ALU2src <= '1';
-	MemRead <= '0';
-	MemWrite <= '0';
-	RegWrite <= '1';
-	MemToReg <= '0';
-	ALUOp <= "000017";
-	}
+	ALUOp <= "10001";
 	
-	--ADD
-	when x"20" => 
+	-- DIVIDING OUTPUT 4
+	elsif funct = "011010" then
 	ALU1src <= '0';
 	ALU2src <= '1';
 	MemRead <= '0';
 	MemWrite <= '0';
-	RegWrite <= '0';
+	RegWrite <= '1';
+	MemToReg <= '0';
+	ALUOp <= "00100";
+	
+	-- MULT	OUTPUT 3
+	elsif funct = "011000" then
+	ALU1src <= '0';
+	ALU2src <= '1';
+	MemRead <= '0';
+	MemWrite <= '0';
+	RegWrite <= '1';
+	MemToReg <= '0';
+	ALUOp <= "00011";
+	
+	--SRA OUTPUT 18
+	elsif funct = "000011" then 
+	ALU1src <= '0';
+	ALU2src <= '0';
+	MemRead <= '0';
+	MemWrite <= '0';
+	RegWrite <= '1';
+	MemToReg <= '0';
+	ALUOp <= "10010";
+	
+	-- TO DO HIGH OUTPUT 14
+	elsif funct = "001010" then
+	ALU1src <= '0';
+	ALU2src <= '1';
+	MemRead <= '0';
+	MemWrite <= '0';
+	RegWrite <= '1';
+	MemToReg <= '0';
+	ALUOp <= "01110";
+	
+	--TO DO LOW  OUTPUT 15
+	elsif funct = "001100" then 
+	ALU1src <= '0';
+	ALU2src <= '1';
+	MemRead <= '0';
+	MemWrite <= '0';
+	RegWrite <= '1';
+	MemToReg <= '0';
+	ALUOp <= "01111";
+	
+	end if;
+	
+	--ADD	OUTPUT 0
+	when "100000" => 
+	ALU1src <= '0';
+	ALU2src <= '1';
+	MemRead <= '0';
+	MemWrite <= '0';
+	RegWrite <= '1';
 	MemToReg <= '0';
 	ALUOp <= "00000"; 
 	
-	--SUB
-	when x"22" => 
+	--SUB OUTPUT 1
+	when "100010" => 
 	ALU1src <= '0';
 	ALU2src <= '1';
 	MemRead <= '0';
 	MemWrite <= '0';
-	RegWrite <= '0';
+	RegWrite <= '1';
 	MemToReg <= '0';
 	ALUOp <= "00001"; 
 	
-	--ADDI
-	when x"08" => 
+	--ADDI OUTPUT 2
+	when "001000" => 
 	ALU1src <= '0';
 	ALU2src <= '0';
 	MemRead <= '0';
 	MemWrite <= '0';
-	RegWrite <= '0';
-	MemToReg <= '0';
-	ALUOp <= "00002"; 
-	
-	--MULT  TO DO
-	when x"08" => 
-	ALU1src <= '0';
-	ALU2src <= '1';
-	MemRead <= '0';
-	MemWrite <= '0';
-	RegWrite <= '0';
-	MemToReg <= '0';
-	ALUOp <= "00003"; 
-	
-	--DIVIDE TO DO
-	when x"08" => 
-	ALU1src <= '0';
-	ALU2src <= '1';
-	MemRead <= '0';
-	MemWrite <= '0';
-	RegWrite <= '0';
-	MemToReg <= '0';
-	ALUOp <= "00004"; 
-	
-	--SLT
-	when x"2A" => 
-	ALU1src <= '0';
-	ALU2src <= '1';
-	MemRead <= '0';
-	MemWrite <= '0';
-	RegWrite <= '0';
-	MemToReg <= '0';
-	ALUOp <= "00005"; 
-	
-	--SLTI 
-	when x"0A" => 
-	ALU1src <= '0';
-	ALU2src <= '0';
-	MemRead <= '0';
-	MemWrite <= '0';
-	RegWrite <= '0';
-	MemToReg <= '0';
-	ALUOp <= "00006"; 
-	
-	--AND
-	when x"24" => 
-	ALU1src <= '0';
-	ALU2src <= '1';
-	MemRead <= '0';
-	MemWrite <= '0';
-	RegWrite <= '0';
-	MemToReg <= '0';
-	ALUOp <= "00007"; 
-	
-	--OR 
-	when x"25" => 
-	ALU1src <= '0';
-	ALU2src <= '1';
-	MemRead <= '0';
-	MemWrite <= '0';
-	RegWrite <= '0';
-	MemToReg <= '0';
-	ALUOp <= "00008"; 
-	
-	--NOR
-	when x"27" => 
-	ALU1src <= '0';
-	ALU2src <= '1';
-	MemRead <= '0';
-	MemWrite <= '0';
-	RegWrite <= '0';
-	MemToReg <= '0';
-	ALUOp <= "00009"; 
-	
-	--XOR
-	when x"26" => 
-	ALU1src <= '0';
-	ALU2src <= '1';
-	MemRead <= '0';
-	MemWrite <= '0';
-	RegWrite <= '0';
+	RegWrite <= '1';
 	MemToReg <= '0';
 	ALUOp <= "00010"; 
-	
-	--ANDI
-	when x"0C" => 
-	ALU1src <= '0';
-	ALU2src <= '0';
-	MemRead <= '0';
-	MemWrite <= '0';
-	RegWrite <= '0';
-	MemToReg <= '0';
-	ALUOp <= "00011"; 
-	
-	--ORI
-	
-	when x"0D" => 
-	ALU1src <= '0';
-	ALU2src <= '0';
-	MemRead <= '0';
-	MemWrite <= '0';
-	RegWrite <= '0';
-	MemToReg <= '0';
-	ALUOp <= "00012"; 
-	
-	--XORI
-	
-	when x"0E" => 
-	ALU1src <= '0';
-	ALU2src <= '0';
-	MemRead <= '0';
-	MemWrite <= '0';
-	RegWrite <= '0';
-	MemToReg <= '0';
-	ALUOp <= "000013"; 
-	
-	--HIGH
-	when x"08" => 
-	ALU1src <= '0';
-	ALU2src <= '1';
-	MemRead <= '0';
-	MemWrite <= '0';
-	RegWrite <= '0';
-	MemToReg <= '0';
-	ALUOp <= "000014"; 
-	
-	--LOW
-	
-	
-	when x"08" => 
-	ALU1src <= '0';
-	ALU2src <= '1';
-	MemRead <= '0';
-	MemWrite <= '0';
-	RegWrite <= '0';
-	MemToReg <= '0';
-	ALUOp <= "000015"; 
-	
-	
-	--LUI
-	
-	when x"0F" => 
-	ALU1src <= '0';
-	ALU2src <= '0';
-	MemRead <= '0';
-	MemWrite <= '0';
-	RegWrite <= '0';
-	MemToReg <= '0';
-	ALUOp <= "000016"; 
-	
-	--SRL PADED BY SIGN EXTEND
-	when x"02" => 
-	ALU1src <= '0';
-	ALU2src <= '1';
-	MemRead <= '0';
-	MemWrite <= '0';
-	RegWrite <= '1';
-	MemToReg <= '0';
-	ALUOp <= "000018";
-
-	--ADDED AT TOP
-	--SRA Paded by sign extend 
-	when x"08" => 
-	ALU1src <= '0';
-	ALU2src <= '1';
-	MemRead <= '0';
-	MemWrite <= '0';
-	RegWrite <= '1';
-	MemToReg <= '0';
-	ALUOp <= "000019"; 
 		
+	--SLT OUTPUT 5
+	when "101010" => 
+	ALU1src <= '0';
+	ALU2src <= '1';
+	MemRead <= '0';
+	MemWrite <= '0';
+	RegWrite <= '0';
+	MemToReg <= '0';
+	ALUOp <= "00101"; 
 	
-	-- LW
-	when x"23" => 
+	--SLTI OUTPUT 6
+	when "001010" => 
+	ALU1src <= '0';
+	ALU2src <= '0';
+	MemRead <= '0';
+	MemWrite <= '0';
+	RegWrite <= '0';
+	MemToReg <= '0';
+	ALUOp <= "00110"; 
+	
+	--AND OUTPUT 7
+	when "100100" => 
+	ALU1src <= '0';
+	ALU2src <= '1';
+	MemRead <= '0';
+	MemWrite <= '0';
+	RegWrite <= '0';
+	MemToReg <= '0';
+	ALUOp <= "00111"; 
+	
+	--OR OUTPUT 8
+	when "100101" => 
+	ALU1src <= '0';
+	ALU2src <= '1';
+	MemRead <= '0';
+	MemWrite <= '0';
+	RegWrite <= '0';
+	MemToReg <= '0';
+	ALUOp <= "01000"; 
+	
+	--NOR OUTPUT 9
+	when "100111" => 
+	ALU1src <= '0';
+	ALU2src <= '1';
+	MemRead <= '0';
+	MemWrite <= '0';
+	RegWrite <= '0';
+	MemToReg <= '0';
+	ALUOp <= "01001"; 
+	
+	--XOR OUTPUT 10
+	when "100110" => 
+	ALU1src <= '0';
+	ALU2src <= '1';
+	MemRead <= '0';
+	MemWrite <= '0';
+	RegWrite <= '0';
+	MemToReg <= '0';
+	ALUOp <= "01010"; 
+	
+	--ANDI OUTPUT 11
+	when "001100" => 
+	ALU1src <= '0';
+	ALU2src <= '0';
+	MemRead <= '0';
+	MemWrite <= '0';
+	RegWrite <= '0';
+	MemToReg <= '0';
+	ALUOp <= "01011"; 
+	
+	--ORI OUTPUT 12
+	
+	when "001101" => 
+	ALU1src <= '0';
+	ALU2src <= '0';
+	MemRead <= '0';
+	MemWrite <= '0';
+	RegWrite <= '0';
+	MemToReg <= '0';
+	ALUOp <= "01100"; 
+	
+	--XORI OUTPUT 13
+	
+	when "001110" => 
+	ALU1src <= '0';
+	ALU2src <= '0';
+	MemRead <= '0';
+	MemWrite <= '0';
+	RegWrite <= '0';
+	MemToReg <= '0';
+	ALUOp <= "01101"; 
+	
+	--LUI OUTPUT 16
+	
+	when "001111" => 
+	ALU1src <= '0';
+	ALU2src <= '0';
+	MemRead <= '0';
+	MemWrite <= '0';
+	RegWrite <= '0';
+	MemToReg <= '0';
+	ALUOp <= "10000"; 
+	
+	--SRL PADED BY SIGN EXTEND   OUTPUT 18
+	when "000010" => 
+	ALU1src <= '0';
+	ALU2src <= '1';
+	MemRead <= '0';
+	MemWrite <= '0';
+	RegWrite <= '1';
+	MemToReg <= '0';
+	ALUOp <= "10010";
+	
+	-- LW OUTPUT 20
+	when "100011" => 
 	ALU1src <= '0';
 	ALU2src <= '0';
 	MemRead <= '1';
 	MemWrite <= '0';
 	RegWrite <= '1';
 	MemToReg <= '1';
-	ALUOp <= "00020"; 
+	ALUOp <= "10100"; 
 	
-	-- Store 
+	-- Store  OUTPUT 21
 	
-	when x"2b" => 
+	when "101011" => 
 	ALU1src <= '0';
 	ALU2src <= '0';
 	MemRead <= '0';
@@ -305,62 +252,64 @@ begin
 	RegWrite <= '0';
 	-- ?
 	MemToReg <= '1';
-	ALUOp <= "00021"; 
+	ALUOp <= "10101"; 
 	
-	-- BEQ
-	when x"04" => 
+	-- BEQ	OUTPUT 22
+	when "000100" => 
 	ALU1src <= '1';
 	ALU2src <= '0';
 	MemRead <= '0';
 	MemWrite <= '0';
 	RegWrite <= '0';
 	MemToReg <= '0';
-	ALUOp <= "000022"; 
+	ALUOp <= "10110"; 
 	
-	--BNE
+	--BNE	OUTPUT 23
 	
-	when x"05" => 
+	when "000101" => 
 	ALU1src <= '1';
 	ALU2src <= '0';
 	MemRead <= '0';
 	MemWrite <= '0';
 	RegWrite <= '0';
 	MemToReg <= '0';
-	ALUOp <= "000023"; 
+	ALUOp <= "10111"; 
 	
-	-- JUMP 
+	-- JUMP OUTPUT 24 
 	
-	when x"02" => 
+	--when "000010" => 
+	--ALU1src <= '0';
+	--ALU2src <= '1';
+	--MemRead <= '0';
+	--MemWrite <= '0';
+	--RegWrite <= '0';
+	--MemToReg <= '0';
+	--ALUOp <= "11000"; 
+	
+	--JUMP REGISTER OUTPUT 25
+	--when "000011" => 
+	--ALU1src <= '0';
+	--ALU2src <= '1';
+	--MemRead <= '0';
+	--MemWrite <= '0';
+	--RegWrite <= '0';
+	--MemToReg <= '0';
+	--ALUOp <= "11001"; 
+	
+	-- JUMP AND LINK  OUTPUT 26
+	when "000011" => 
 	ALU1src <= '0';
 	ALU2src <= '1';
 	MemRead <= '0';
 	MemWrite <= '0';
 	RegWrite <= '0';
 	MemToReg <= '0';
-	ALUOp <= "000024"; 
+	ALUOp <= "11010"; 
 	
-	--JUMP REGISTER
-	when x"08" => 
-	ALU1src <= '0';
-	ALU2src <= '1';
-	MemRead <= '0';
-	MemWrite <= '0';
-	RegWrite <= '0';
-	MemToReg <= '0';
-	ALUOp <= "000025"; 
+	when others =>
 	
-	
-	-- JUMP AND LINK 
-	when x"03" => 
-	ALU1src <= '0';
-	ALU2src <= '1';
-	MemRead <= '0';
-	MemWrite <= '0';
-	RegWrite <= '0';
-	MemToReg <= '0';
-	ALUOp <= "000026"; 
+	end case;
 	
 end process;
-	
 	
 end controller_arch;
