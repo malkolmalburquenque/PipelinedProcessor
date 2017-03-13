@@ -54,8 +54,8 @@ end component;
 --MUX 
 
 component mux is
-port(clk : in std_logic;
-	 input2 : in std_logic_vector(31 downto 0);
+port(
+	 input0 : in std_logic_vector(31 downto 0);
 	 input1 : in std_logic_vector(31 downto 0);
 	 selectInput : in std_logic;
 	 selectOutput : out std_logic_vector(31 downto 0)
@@ -66,19 +66,15 @@ end component;
 --ADDER 
 
 component adder is
-port(clk : in std_logic;
+port(
 	 plusFour : in integer;
 	 counterOutput : in std_logic_vector(31 downto 0);
 	 adderOutput : out std_logic_vector(31 downto 0)
 	 );
 end component;
 
-
-
-
 -- SET SIGNALS 
 	signal rst : std_logic := '0';
-    constant clk_period : time := 1 ns;
     signal writedata: std_logic_vector(31 downto 0);
     signal address: INTEGER RANGE 0 TO 1024-1;
     
@@ -97,6 +93,11 @@ end component;
 	
 begin
 
+
+selectOutput <= internal_selectOutput;
+address <= to_integer(unsigned(addOutput(9 downto 0)))/4;
+
+
 pcCounter : pc 
 port map(
 	clk => clk,
@@ -107,7 +108,7 @@ port map(
 
 add : adder
 port map(
-	clk => clk,
+	 
 	 plusFour => four,
 	 counterOutput => pcOutput,
 	 adderOutput => addOutput
@@ -115,10 +116,8 @@ port map(
 
 fetchMux : mux 
 port map(
-	 clk => clk,
-	 input2 => muxInput0,
-	 -- CHANGE INPUT1
-	 input1 => internal_selectOutput,
+	 input0 => muxInput0,
+	 input1 => addOutput,
 	 selectInput => selectInputs,
 	 selectOutput => internal_selectOutput
 	 );
@@ -137,7 +136,6 @@ iMem : instructionMemory
                     waitrequest
                 );
 				
-	selectOutput <= internal_selectOutput;
-
+	
 				
 end instructionFetchStage_arch;
