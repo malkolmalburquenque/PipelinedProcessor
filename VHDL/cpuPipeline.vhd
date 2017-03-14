@@ -67,6 +67,17 @@ component signextender is
         immediate_out: OUT STD_LOGIC_VECTOR (31 DOWNTO 0)
     );
 end component;
+	
+component mux is
+port(
+	 input0 : in std_logic_vector(31 downto 0);
+	 input1 : in std_logic_vector(31 downto 0);
+	 selectInput : in std_logic;
+	 selectOutput : out std_logic_vector(31 downto 0)
+	 );
+	 	
+	
+end component;
 
 -- TEST SIGNALS 
 signal muxInput : STD_LOGIC_VECTOR(31 downto 0) := "00000000000000000000000000000000";
@@ -104,6 +115,10 @@ signal shamnt : std_logic_vector(4 downto 0);
 
 signal immediate : std_logic_vector(15 downto 0); 
 signal immediate_out : std_logic_vector(31 downto 0);
+
+-- SIGNALS FOR EXECUTE STAGE MUXES 
+signal muxOutput1 : std_logic_vector(31 downto 0);
+signal muxOutput2 : std_logic_vector(31 downto 0);
 
 begin
 
@@ -149,6 +164,25 @@ clock => clk,
 immediate_in => immediate,
 immediate_out => immediate_out
 );
+
+-- EXECUTE STAGE 
+exMux1 : mux 
+port map (
+input0 => IDEXaddress,
+input1 => IDEXra,
+selectInput => ALU1srcO,
+selectOutput => muxOutput1
+);
+
+exMux2 : mux 
+port map (
+input0 => IDEXrb,
+input1 => IDEXimmediate,
+selectInput => ALU2srcO,
+selectOutput => muxOutput2
+);
+
+
 
 process (clk)
 begin
