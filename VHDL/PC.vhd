@@ -20,10 +20,12 @@ begin
 	
 	if (reset = '1') then
 		counterOutput <= x"00000000";
+	elsif (clk'event and clk = '1') then 	
+		counterOutput <= counterInput;
+
 	end if;
 	
-	counterOutput <= counterInput;
-
+	
 	end process;
 
 
