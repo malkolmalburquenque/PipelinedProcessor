@@ -44,46 +44,26 @@ BEGIN
 
         -- test 1
         immediate_in <= "0000000000000000";
-        wait for clock_period;
-        assert immediate_out = "00000000000000000000000000000000"
-        report "FAIL: Test 1."
-        severity WARNING;
 
         wait for clock_period;
 
         -- test 2
         immediate_in <= "1111111111111111";
-        wait for clock_period;
-        assert immediate_out = "00000000000000001111111111111111"
-        report "FAIL: Test 2."
-        severity WARNING;
 
         wait for clock_period;
 
         -- test 3
         immediate_in <= "1111111111111001";
-        wait for clock_period;
-        assert immediate_out = "00000000000000001111111111111001"
-        report "FAIL: Test 3."
-        severity WARNING;
 
         wait for clock_period;
 
         -- test 4
         immediate_in <= "0000111111111111";
-        wait for clock_period;
-        assert immediate_out = "00000000000000000000111111111111"
-        report "FAIL: Test 4."
-        severity WARNING;
 
         wait for clock_period;
 
         -- test 5
         immediate_in <= "1010101010101010";
-        wait for clock_period;
-        assert immediate_out = "00000000000000001010101010101010"
-        report "FAIL: Test 5."
-        severity WARNING;
 
         WAIT;
     END PROCESS;
