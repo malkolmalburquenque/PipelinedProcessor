@@ -11,6 +11,7 @@ ARCHITECTURE behav of alu_tb IS
 			input_a : in STD_LOGIC_VECTOR (31 downto 0);
 			input_b : in STD_LOGIC_VECTOR (31 downto 0);
 			SEL : in STD_LOGIC_VECTOR (4 downto 0);
+			clock : in STD_LOGIC;
 			out_alu : out signed(31 downto 0)
 		);
 	END COMPONENT;
@@ -23,7 +24,7 @@ ARCHITECTURE behav of alu_tb IS
 	SIGNAL out_alu : SIGNED (31 downto 0);
 
 BEGIN
-
+	alutest : alu
 	PORT MAP(
 		input_a => input_a,
 		input_b => input_b,
@@ -40,5 +41,24 @@ BEGIN
 		wait for clock_period/2;
 	END PROCESS;
 
+	test_process : PROCESS
+	BEGIN
+		wait for clock_period;
 
+		-- ADD
+		input_a <= "00000000000000000000000000000000";
+		input_b <= "00000000000000000000000000000001";
+		sel <= "00000";
+		wait for clock_period;
+
+		--SUBTRACT
+		input_a <= "00000000000000000000000000000001";
+		input_b <= "00000000000000000000000000000001";
+		sel <= "00001";
+		wait for clock_period;
+
+
+
+		WAIT;
+	END PROCESS;
 END behav;
