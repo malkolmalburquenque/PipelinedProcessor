@@ -6,34 +6,37 @@ entity alu is
  Port ( input_a : in STD_LOGIC_VECTOR (31 downto 0);
  input_b : in STD_LOGIC_VECTOR (31 downto 0);
  SEL : in STD_LOGIC_VECTOR (4 downto 0);
- out_alu : out signed(31 downto 0));
+ out_alu : out STD_LOGIC_VECTOR(31 downto 0));
 end alu;
  
 architecture Behavioral of alu is
+
+signal shift : std_logic_vector (31 downto 0);
+
 begin
-process(input_a, input_b, SEL) 
+process(input_a, input_b, SEL) 	
 begin
 case SEL is
  
- when "00000" =>  
- out_alu<= input_a + input_b; --ADD
+ when "00000" =>
+ out_alu<= std_logic_vector(to_unsigned(to_integer (unsigned(input_a)) +   to_integer (unsigned(input_b)), out_alu'length)) ; --ADD
  
  when "00001" => 
- out_alu<= input_a - input_b; --SUB 
+ out_alu<= std_logic_vector(to_unsigned(to_integer (unsigned(input_a)) -   to_integer (unsigned(input_b)), out_alu'length)); --SUB 
  
  when "00010" => 
  
  when "00011" => 
- out_alu<= input_a * input_b; --MULT
+ out_alu<= std_logic_vector(to_unsigned(to_integer (unsigned(input_a)) *   to_integer (unsigned(input_b)), out_alu'length)); --MULT
  
  when "00100" =>  
- out_alu<= input_a/input_b;   --DIV
+ out_alu<= std_logic_vector(to_unsigned(to_integer (unsigned(input_a)) /   to_integer (unsigned(input_b)), out_alu'length));   --DIV
 
  when "00101" =>  
  if (input_a < input_b) then  --SLT
-	out_alu <= 1;
+	out_alu <= x"00000001";
 	else
-	out_alu <= 0;
+	out_alu <= x"00000001";
  end if;
  
  when "00110" => 
@@ -63,11 +66,12 @@ case SEL is
  when "10000" =>
  
  when "10001" =>
- out_alu<= input_a sll to_integer(unsigned(input_b(10 downto 6))); --sll
+	out_alu <= input_a ((31 - to_integer(unsigned(input_b(10 downto 6)))) downto 0)  & std_logic_vector(to_unsigned(0, to_integer(unsigned(input_b(10 downto 6)))));
+
  
  when "10010" =>
- out_alu<= input_a srl to_integer(unsigned(input_b(10 downto 6))); --srl
- 
+	out_alu <= std_logic_vector(to_unsigned(0, to_integer(unsigned(input_b(10 downto 6))))) & input_a (31 downto (0 + to_integer(unsigned(input_b(10 downto 6)))));
+	
  when "10011" =>
  
  when "10100" =>
