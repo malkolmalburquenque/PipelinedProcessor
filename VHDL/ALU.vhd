@@ -84,15 +84,14 @@ case SEL is
 	out_alu <= std_logic_vector(to_unsigned(0, to_integer(unsigned(input_b(10 downto 6))))) & input_a (31 downto (0 + to_integer(unsigned(input_b(10 downto 6)))));
 	
  when "10011" => -- sra
-	if input_a (31 downto 30) == '0' then
+	if input_a(31) = '0' then
 		out_alu <= std_logic_vector(to_unsigned(0, to_integer(unsigned(input_b(10 downto 6))))) & input_a (31 downto (0 + to_integer(unsigned(input_b(10 downto 6)))));
 	else
 		out_alu <= std_logic_vector(to_unsigned(1, to_integer(unsigned(input_b(10 downto 6))))) & input_a (31 downto (0 + to_integer(unsigned(input_b(10 downto 6)))));
 	end if;	
  
  when "10100" => -- lw
-	out_alu <= input_b;
- 
+ out_alu <= input_b;
  when "10101" => -- sw
 	out_alu <= input_b;
  

@@ -21,7 +21,7 @@ architecture controller_arch of controller is
 
 begin
 
-process (clk)
+process (opcode,funct)
 begin
 	
 	case opcode is

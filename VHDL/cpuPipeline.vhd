@@ -79,6 +79,15 @@ port(
 	
 end component;
 
+component alu is
+ Port ( input_a : in STD_LOGIC_VECTOR (31 downto 0);
+ input_b : in STD_LOGIC_VECTOR (31 downto 0);
+ SEL : in STD_LOGIC_VECTOR (4 downto 0);
+ out_alu : out STD_LOGIC_VECTOR(31 downto 0));
+end component;
+ 
+
+
 -- TEST SIGNALS 
 signal muxInput : STD_LOGIC_VECTOR(31 downto 0) := "00000000000000000000000000000000";
 signal selectInput : std_logic := '1';
@@ -97,14 +106,13 @@ signal IDEXaddress : std_logic_vector(31 downto 0);
 signal IDEXra : std_logic_vector(31 downto 0);
 signal IDEXrb : std_logic_vector(31 downto 0);
 signal IDEXimmediate : std_logic_vector(31 downto 0);
--- ??  no idea what the last signal is 
-signal IDEXsomething : std_logic_vector (31 downto 0);
+signal IDEXrd : std_logic_vector (4 downto 0);
 
 
 -- SIGNALS FOR CONTROLLER
 signal opcodeInput,functInput : std_logic_vector(5 downto 0);
 signal ALU1srcO,ALU2srcO,MemReadO,MemWriteO,RegWriteO,MemToRegO : std_logic;
-signal output : std_logic_vector(4 downto 0);
+signal ALUOp : std_logic_vector(4 downto 0);
 
 -- SIGNALS FOR REGISTERS
 signal rs,rt,rd : std_logic_vector (4 downto 0);
@@ -119,13 +127,21 @@ signal immediate_out : std_logic_vector(31 downto 0);
 -- SIGNALS FOR EXECUTE STAGE MUXES 
 signal muxOutput1 : std_logic_vector(31 downto 0);
 signal muxOutput2 : std_logic_vector(31 downto 0);
+signal aluOutput : std_logic_vector(31 downto 0);
+
+-- SIGNALS FOR EXMEM
+signal EXMEMBranch : std_logic; -- need the zero variable 
+signal EXMEMaluOutput : std_logic_vector(31 downto 0);
+signal EXMEMregisterOutput : std_logic_vector(31 downto 0);
+signal EXMEMrd : std_logic_vector(4 downto 0);
+
 
 begin
 
 IFS : instructionFetchStage
 port map(
 	clk => clk,
-	muxInput0 => muxInput,
+	muxInput0 => EXMEMaluOutput,
 	selectInputs => selectInput,
 	four => fourInt,
 	selectOutput => address,
@@ -143,7 +159,7 @@ port map(
 	MemWrite => MemWriteO,
 	RegWrite => RegWriteO,
 	MemToReg => MemToRegO,
-	ALUOp => output 
+	ALUOp => ALUOp 
 );
 
 RegisterFile : register_file
@@ -168,34 +184,51 @@ immediate_out => immediate_out
 -- EXECUTE STAGE 
 exMux1 : mux 
 port map (
-input0 => IDEXaddress,
-input1 => IDEXra,
+input0 => IDEXra,
+input1 => IDEXaddress,
 selectInput => ALU1srcO,
 selectOutput => muxOutput1
 );
 
 exMux2 : mux 
 port map (
-input0 => IDEXrb,
-input1 => IDEXimmediate,
+input0 => IDEXimmediate,
+input1 => IDEXrb,
 selectInput => ALU2srcO,
 selectOutput => muxOutput2
 );
 
-
+operator : alu 
+port map( 
+input_a => muxOutput1,
+input_b => muxOutput2,
+SEL => ALUOp,
+out_alu => aluOutput
+);
 
 process (clk)
 begin
 
 if (clk'event and clk = '1') then
 --PIPELINED VALUE 
+--IFID 
 IFIDaddress <= address;
 IFIDinstruction <= instruction;
 
+-- IDEX
 IDEXaddress <= IFIDaddress;
 IDEXra <= ra;
 IDEXrb <= rb;
 IDEXimmediate <= immediate_out;
+
+
+
+--EXMEM 
+--EXMEMBranch <= 
+EXMEMaluOutput <= aluOutput;
+EXMEMregisterOutput <= IDEXrb;
+EXMEMrd <= IDEXrd;
+
 end if ;
 end process;
 
@@ -209,7 +242,7 @@ rd <= IFIDinstruction(15 downto 11);
 shamnt <= IFIDinstruction(10 downto 6);
 -- EXTENDED
 immediate <= IFIDinstruction(15 downto 0);
-
+IDEXrd <= rd;
 -- MIGHT NEED TO PUT WRITE ENABLE HERE LATER 
 -- AND JUMP ADDRESS HERE 
 
