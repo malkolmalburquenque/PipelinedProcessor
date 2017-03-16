@@ -93,8 +93,26 @@ port (input_a : in std_logic_vector (31 downto 0);
 	result: out std_logic
   );
 end component;
- 
---MEM
+
+--MEMORY OBJ FOR MEM STAGE
+COMPONENT memory IS
+	GENERIC(
+		ram_size : INTEGER := 8192;
+		mem_delay : time := 10 ns;
+		clock_period : time := 1 ns
+	);
+	PORT (
+		clock: IN STD_LOGIC;
+		writedata: IN STD_LOGIC_VECTOR (31 DOWNTO 0);
+		address: IN INTEGER RANGE 0 TO ram_size-1;
+		memwrite: IN STD_LOGIC := '0';
+		memread: IN STD_LOGIC := '0';
+		readdata: OUT STD_LOGIC_VECTOR (31 DOWNTO 0);
+		waitrequest: OUT STD_LOGIC
+	);
+END COMPONENT;
+
+--MEM STAGE
 component mem is  
 port (clk: in std_logic;
 	-- Control lines
@@ -115,7 +133,7 @@ port (clk: in std_logic;
 	
 	--Memory signals
 	writedata: OUT STD_LOGIC_VECTOR (31 DOWNTO 0);
-	address: OUT INTEGER RANGE 0 TO ram_size-1;
+	address: OUT INTEGER RANGE 0 TO 32768 -1;
 	memwrite: OUT STD_LOGIC := '0';
 	memread: OUT STD_LOGIC := '0';
 	readdata: IN STD_LOGIC_VECTOR (31 DOWNTO 0);
@@ -124,7 +142,18 @@ port (clk: in std_logic;
   );
 end component;
  
- 
+component wbStage is
+port (ctrl_memtoreg_in: in std_logic;
+	ctrl_regwrite_in: in std_logic;
+	ctrl_regwrite_out: out std_logic;
+	
+	alu_in : in std_logic_vector (31 downto 0);
+	mem_in: in std_logic_vector (31 downto 0);
+	mux_out : out std_logic_vector (31 downto 0);
+	write_addr_in: in std_logic_vector (4 downto 0);
+	write_addr_out: out std_logic_vector (4 downto 0)
+);
+ end component;
 
 -- TEST SIGNALS 
 signal muxInput : STD_LOGIC_VECTOR(31 downto 0) := "00000000000000000000000000000000";
@@ -266,9 +295,9 @@ optype => ALUOp,
 result => zeroOutput
 );
 
-dataMemory : data 
+memStage : mem
 port map (
-clk: in std_logic;
+	clk =>clk,
 	-- Control lines
 	ctrl_write => MemWriteO,
 	ctrl_read => MemReadO,
@@ -294,7 +323,27 @@ clk: in std_logic;
 	waitrequest => MEMwaitrequest
 );
 
+memMemory: memory
+port map (
+	clock => clk,
+	writedata => MEMwritedata,
+	address => MEMaddress,
+	memwrite => MEMmemwrite,
+	memread  => MEMmemread,
+	readdata => MEMreaddata,
+	waitrequest => MEMwaitrequest
+);
 
+wb: wbStage
+port map (ctrl_memtoreg_in => memtoReg,
+	ctrl_regwrite_in => regWrite,
+	ctrl_regwrite_out => write_enable,
+	alu_in  => MEMWBaluOutput,
+	mem_in => MEMWBmemOutput,
+	mux_out  => rd_data,
+	write_addr_in => MEMWBrd,
+	write_addr_out => rd
+);
 
 process (clk)
 begin
