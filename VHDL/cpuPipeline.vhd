@@ -85,8 +85,46 @@ component alu is
  SEL : in STD_LOGIC_VECTOR (4 downto 0);
  out_alu : out STD_LOGIC_VECTOR(31 downto 0));
 end component;
- 
 
+component zero is
+port (input_a : in std_logic_vector (31 downto 0);
+	input_b : in std_logic_vector (31 downto 0);
+	optype : in std_logic_vector (4 downto 0);
+	result: out std_logic
+  );
+end component;
+ 
+--MEM
+component mem is  
+port (clk: in std_logic;
+	-- Control lines
+	ctrl_write : in std_logic;
+	ctrl_read: in std_logic;
+	ctrl_memtoreg_in: in std_logic;
+	ctrl_memtoreg_out: out std_logic;
+	ctrl_regwrite_in: in std_logic;
+	ctrl_regwrite_out: out std_logic;
+
+	--Ports of stage
+	alu_in : in std_logic_vector (31 downto 0);
+	alu_out : out std_logic_vector (31 downto 0);
+	mem_data_in: in std_logic_vector (31 downto 0);
+	mem_data_out: out std_logic_vector (31 downto 0);
+	write_addr_in: in std_logic_vector (4 downto 0);
+	write_addr_out: out std_logic_vector (4 downto 0);
+	
+	--Memory signals
+	writedata: OUT STD_LOGIC_VECTOR (31 DOWNTO 0);
+	address: OUT INTEGER RANGE 0 TO ram_size-1;
+	memwrite: OUT STD_LOGIC := '0';
+	memread: OUT STD_LOGIC := '0';
+	readdata: IN STD_LOGIC_VECTOR (31 DOWNTO 0);
+	waitrequest: IN STD_LOGIC
+	
+  );
+end component;
+ 
+ 
 
 -- TEST SIGNALS 
 signal muxInput : STD_LOGIC_VECTOR(31 downto 0) := "00000000000000000000000000000000";
@@ -124,10 +162,11 @@ signal shamnt : std_logic_vector(4 downto 0);
 signal immediate : std_logic_vector(15 downto 0); 
 signal immediate_out : std_logic_vector(31 downto 0);
 
--- SIGNALS FOR EXECUTE STAGE MUXES 
+-- SIGNALS FOR EXECUTE STAGE  
 signal muxOutput1 : std_logic_vector(31 downto 0);
 signal muxOutput2 : std_logic_vector(31 downto 0);
 signal aluOutput : std_logic_vector(31 downto 0);
+signal zeroOutput : std_logic;
 
 -- SIGNALS FOR EXMEM
 signal EXMEMBranch : std_logic; -- need the zero variable 
@@ -135,6 +174,19 @@ signal EXMEMaluOutput : std_logic_vector(31 downto 0);
 signal EXMEMregisterOutput : std_logic_vector(31 downto 0);
 signal EXMEMrd : std_logic_vector(4 downto 0);
 
+-- MEM SIGNALS 
+signal MEMWBmemOutput : std_logic_vector(31 downto 0);
+signal MEMWBaluOutput : std_logic_vector(31 downto 0);
+signal MEMWBrd : std_logic_vector(4 downto 0);
+signal memtoReg : std_logic;
+signal regWrite : std_logic;
+
+signal	MEMwritedata : std_logic_vector(31 downto 0);
+signal	MEMaddress : INTEGER;
+signal	MEMmemwrite : STD_LOGIC;
+signal	MEMmemread  : STD_LOGIC;
+signal	MEMreaddata : std_logic_vector(31 downto 0);
+signal	MEMwaitrequest : STD_LOGIC;
 
 begin
 
@@ -142,7 +194,7 @@ IFS : instructionFetchStage
 port map(
 	clk => clk,
 	muxInput0 => EXMEMaluOutput,
-	selectInputs => selectInput,
+	selectInputs => EXMEMBranch,
 	four => fourInt,
 	selectOutput => address,
 	instructionMemoryOutput => instruction
@@ -206,6 +258,44 @@ SEL => ALUOp,
 out_alu => aluOutput
 );
 
+zr : zero 
+port map (
+input_a => IDEXra,
+input_b => IDEXrb, 
+optype => ALUOp,  
+result => zeroOutput
+);
+
+dataMemory : data 
+port map (
+clk: in std_logic;
+	-- Control lines
+	ctrl_write => MemWriteO,
+	ctrl_read => MemReadO,
+	ctrl_memtoreg_in => MemToRegO,
+	ctrl_memtoreg_out => memtoReg,
+	ctrl_regwrite_in => RegWriteO,
+	ctrl_regwrite_out => regWrite,
+
+	--Ports of stage
+	alu_in => EXMEMaluOutput,
+	alu_out=>  MEMWBaluOutput,
+	mem_data_in => EXMEMregisterOutput,
+	mem_data_out => MEMWBmemOutput, 
+	write_addr_in => EXMEMrd,
+	write_addr_out => MEMWBrd,
+	
+	--Memory signals
+	writedata => MEMwritedata,
+	address => MEMaddress,
+	memwrite => MEMmemwrite,
+	memread  => MEMmemread,
+	readdata => MEMreaddata,
+	waitrequest => MEMwaitrequest
+);
+
+
+
 process (clk)
 begin
 
@@ -221,10 +311,8 @@ IDEXra <= ra;
 IDEXrb <= rb;
 IDEXimmediate <= immediate_out;
 
-
-
 --EXMEM 
---EXMEMBranch <= 
+EXMEMBranch <= zeroOutput; 
 EXMEMaluOutput <= aluOutput;
 EXMEMregisterOutput <= IDEXrb;
 EXMEMrd <= IDEXrd;
@@ -245,7 +333,5 @@ immediate <= IFIDinstruction(15 downto 0);
 IDEXrd <= rd;
 -- MIGHT NEED TO PUT WRITE ENABLE HERE LATER 
 -- AND JUMP ADDRESS HERE 
-
-
 
 end cpuPipeline_arch;

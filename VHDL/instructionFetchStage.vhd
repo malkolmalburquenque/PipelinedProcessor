@@ -116,8 +116,8 @@ port map(
 
 fetchMux : mux 
 port map(
-	 input0 => muxInput0,
-	 input1 => addOutput,
+	 input0 => addOutput,
+	 input1 => muxInput0,
 	 selectInput => selectInputs,
 	 selectOutput => internal_selectOutput
 	 );

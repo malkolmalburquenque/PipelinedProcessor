@@ -6,7 +6,7 @@ entity zero is
 port (input_a : in std_logic_vector (31 downto 0);
 	input_b : in std_logic_vector (31 downto 0);
 	optype : in std_logic_vector (4 downto 0);
-	result: out std_logic
+	result: out std_logic := '0'
   );
 end zero;
 
