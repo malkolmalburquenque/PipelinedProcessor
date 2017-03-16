@@ -1,5 +1,6 @@
-# Created by https://www.gitignore.io/api/java,macos,windows,modelsim
 
+# Created by https://www.gitignore.io/api/java,macos,windows,modelsim
+*.txt
 ### Java ###
 # Compiled class file
 *.class
