@@ -53,7 +53,7 @@ begin
 		alu_out <= alu_next;
 		
 		
-		ctrl_regwrite_out <= ctrl_memtoreg_next;
+		ctrl_regwrite_out <= ctrl_regwrite_next;
 		ctrl_memtoreg_out <= ctrl_memtoreg_next;
 
 	end if;
@@ -74,14 +74,14 @@ begin
 	--Access memory
 	
 	if ctrl_write = '1' then
-		address <= to_integer(unsigned(mem_data_in));	
-		memwrite <= '1';
-		writedata <= alu_in;
+		address <= to_integer(unsigned(alu_in));	
+		memwrite <= '1'; 	
+		writedata <= mem_data_in;
 	elsif ctrl_read = '1' then
-		address <= to_integer(unsigned(mem_data_in));	
+		address <= to_integer(unsigned(alu_in));	
 		memread <= '1';
-		mem_data_next <= readdata;
+		
 	end if;
 end process;
-
+mem_data_next <= readdata;
 end behavioral;
