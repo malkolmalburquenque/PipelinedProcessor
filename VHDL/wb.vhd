@@ -10,8 +10,8 @@ port (ctrl_memtoreg_in: in std_logic;
 	alu_in : in std_logic_vector (31 downto 0);
 	mem_in: in std_logic_vector (31 downto 0);
 	mux_out : out std_logic_vector (31 downto 0);
-	write_addr_in: in std_logic_vector (7 downto 0);
-	write_addr_out: out std_logic_vector (7 downto 0)
+	write_addr_in: in std_logic_vector (4 downto 0);
+	write_addr_out: out std_logic_vector (4 downto 0)
   );
 end wb;
 

@@ -55,14 +55,16 @@ begin
 		
 		ctrl_regwrite_out <= ctrl_memtoreg_next;
 		ctrl_memtoreg_out <= ctrl_memtoreg_next;
-		memwrite <= '0';
-		memread <= '0';
+
 	end if;
 end process;
 
 
 process (write_addr_in , ctrl_memtoreg_in, ctrl_regwrite_in, alu_in)
 begin
+	memwrite <= '0';
+	memread <= '0';
+	
 	--Propogate signals
 	write_addr_next <= write_addr_in;
 	ctrl_memtoreg_next <= ctrl_memtoreg_in;
@@ -70,11 +72,13 @@ begin
 	alu_next <= alu_in;
 
 	--Access memory
-	address <= to_integer(unsigned(alu_in));	
+	
 	if ctrl_write = '1' then
+		address <= to_integer(unsigned(mem_data_in));	
 		memwrite <= '1';
-		writedata <= mem_data_in;
+		writedata <= alu_in;
 	elsif ctrl_read = '1' then
+		address <= to_integer(unsigned(mem_data_in));	
 		memread <= '1';
 		mem_data_next <= readdata;
 	end if;

@@ -142,7 +142,7 @@ port (clk: in std_logic;
   );
 end component;
  
-component wbStage is
+component wb is
 port (ctrl_memtoreg_in: in std_logic;
 	ctrl_regwrite_in: in std_logic;
 	ctrl_regwrite_out: out std_logic;
@@ -334,10 +334,11 @@ port map (
 	waitrequest => MEMwaitrequest
 );
 
-wb: wbStage
+wbStage: wb
 port map (ctrl_memtoreg_in => memtoReg,
 	ctrl_regwrite_in => regWrite,
 	ctrl_regwrite_out => write_enable,
+	
 	alu_in  => MEMWBaluOutput,
 	mem_in => MEMWBmemOutput,
 	mux_out  => rd_data,
