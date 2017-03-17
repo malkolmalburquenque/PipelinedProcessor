@@ -38,6 +38,8 @@ component controller is
 		 MemWrite : out STD_LOGIC;
 		 RegWrite : out STD_LOGIC;
 		 MemToReg : out STD_LOGIC;
+		 RType : out std_logic;
+		 Shift : out std_logic;
 		 ALUOp : out STD_LOGIC_VECTOR(4 downto 0)
 		 );
 end component;
@@ -62,7 +64,6 @@ end component;
 
 component signextender is 
 	PORT (
-        clock: IN STD_LOGIC;
         immediate_in: IN STD_LOGIC_VECTOR (15 DOWNTO 0);
         immediate_out: OUT STD_LOGIC_VECTOR (31 DOWNTO 0)
     );
@@ -174,15 +175,17 @@ signal IDEXra : std_logic_vector(31 downto 0);
 signal IDEXrb : std_logic_vector(31 downto 0);
 signal IDEXimmediate : std_logic_vector(31 downto 0);
 signal IDEXrd : std_logic_vector (4 downto 0);
+signal IDEXALU1srcO, IDEXALU2srcO, IDEXMemReadO, IDEXMeMWriteO, IDEXRegWriteO, IDEXMemToRegO: std_logic;
+signal IDEXAluOp : std_logic_vector (4 downto 0);
 
 
 -- SIGNALS FOR CONTROLLER
 signal opcodeInput,functInput : std_logic_vector(5 downto 0);
-signal ALU1srcO,ALU2srcO,MemReadO,MemWriteO,RegWriteO,MemToRegO : std_logic;
+signal ALU1srcO,ALU2srcO,MemReadO,MemWriteO,RegWriteO,MemToRegO,RType,Shift: std_logic;
 signal ALUOp : std_logic_vector(4 downto 0);
 
 -- SIGNALS FOR REGISTERS
-signal rs,rt,rd : std_logic_vector (4 downto 0);
+signal rs,rt,rd,WBrd : std_logic_vector (4 downto 0);
 signal rd_data: std_logic_vector(31 downto 0);
 signal write_enable : std_logic;
 signal ra,rb : std_logic_vector(31 downto 0);
@@ -202,6 +205,7 @@ signal EXMEMBranch : std_logic; -- need the zero variable
 signal EXMEMaluOutput : std_logic_vector(31 downto 0);
 signal EXMEMregisterOutput : std_logic_vector(31 downto 0);
 signal EXMEMrd : std_logic_vector(4 downto 0);
+signal EXMEMMemReadO, EXMEMMeMWriteO, EXMEMRegWriteO, EXMEMMemToRegO: std_logic;
 
 -- MEM SIGNALS 
 signal MEMWBmemOutput : std_logic_vector(31 downto 0);
@@ -240,7 +244,9 @@ port map(
 	MemWrite => MemWriteO,
 	RegWrite => RegWriteO,
 	MemToReg => MemToRegO,
-	ALUOp => ALUOp 
+	ALUOp => ALUOp,
+	Shift => Shift,
+	RType => RType
 );
 
 RegisterFile : register_file
@@ -249,7 +255,7 @@ port map (
 	rs => rs,
 	rt => rt,
 	write_enable => write_enable,
-	rd => rd,
+	rd => WBrd,
 	rd_data => rd_data,
 	ra_data => ra,
 	rb_data => rb
@@ -257,7 +263,6 @@ port map (
 
 se : signextender
 port map(
-clock => clk,
 immediate_in => immediate,
 immediate_out => immediate_out
 );
@@ -267,7 +272,7 @@ exMux1 : mux
 port map (
 input0 => IDEXra,
 input1 => IDEXaddress,
-selectInput => ALU1srcO,
+selectInput => IDEXALU1srcO,
 selectOutput => muxOutput1
 );
 
@@ -275,7 +280,7 @@ exMux2 : mux
 port map (
 input0 => IDEXimmediate,
 input1 => IDEXrb,
-selectInput => ALU2srcO,
+selectInput => IDEXALU2srcO,
 selectOutput => muxOutput2
 );
 
@@ -283,7 +288,7 @@ operator : alu
 port map( 
 input_a => muxOutput1,
 input_b => muxOutput2,
-SEL => ALUOp,
+SEL => IDEXAluOp,
 out_alu => aluOutput
 );
 
@@ -291,7 +296,7 @@ zr : zero
 port map (
 input_a => IDEXra,
 input_b => IDEXrb, 
-optype => ALUOp,  
+optype => IDEXAluOp,  
 result => zeroOutput
 );
 
@@ -299,11 +304,11 @@ memStage : mem
 port map (
 	clk =>clk,
 	-- Control lines
-	ctrl_write => MemWriteO,
-	ctrl_read => MemReadO,
-	ctrl_memtoreg_in => MemToRegO,
+	ctrl_write => EXMEMMemWriteO,
+	ctrl_read => EXMEMMemReadO,
+	ctrl_memtoreg_in => EXMEMMemToRegO,
 	ctrl_memtoreg_out => memtoReg,
-	ctrl_regwrite_in => RegWriteO,
+	ctrl_regwrite_in => EXMEMRegWriteO,
 	ctrl_regwrite_out => regWrite,
 
 	--Ports of stage
@@ -343,7 +348,7 @@ port map (ctrl_memtoreg_in => memtoReg,
 	mem_in => MEMWBmemOutput,
 	mux_out  => rd_data,
 	write_addr_in => MEMWBrd,
-	write_addr_out => rd
+	write_addr_out => WBrd
 );
 
 process (clk)
@@ -357,15 +362,40 @@ IFIDinstruction <= instruction;
 
 -- IDEX
 IDEXaddress <= IFIDaddress;
-IDEXra <= ra;
 IDEXrb <= rb;
-IDEXimmediate <= immediate_out;
 
+--FOR IMMEDIATE VALUES
+if RType = '1' then
+	IDEXrd <= rd;
+else
+	IDEXrd <= rt;
+end if;
+
+--FOR SHIFT INSTRUCTIONS
+if Shift = '1' then
+	IDEXra <= rb;
+else
+	IDEXra <= ra;
+end if;
+
+IDEXimmediate <= immediate_out;
+IDEXALU1srcO <= ALU1srcO;
+IDEXALU2srcO <= ALU2srcO;
+IDEXMemReadO <= MemReadO;
+IDEXMeMWriteO <= MemWriteO;
+IDEXRegWriteO <= RegWriteO;
+IDEXMemToRegO <= MemToRegO;
+IDEXAluOp <= ALUOp;
+	
 --EXMEM 
 EXMEMBranch <= zeroOutput; 
 EXMEMaluOutput <= aluOutput;
 EXMEMregisterOutput <= IDEXrb;
 EXMEMrd <= IDEXrd;
+EXMEMMemReadO <= IDEXMemReadO;
+EXMEMMeMWriteO <= IDEXMeMWriteO;
+EXMEMRegWriteO <= IDEXRegWriteO;
+EXMEMMemToRegO <= IDEXMemToRegO;
 
 end if ;
 end process;
@@ -380,7 +410,6 @@ rd <= IFIDinstruction(15 downto 11);
 shamnt <= IFIDinstruction(10 downto 6);
 -- EXTENDED
 immediate <= IFIDinstruction(15 downto 0);
-IDEXrd <= rd;
 -- MIGHT NEED TO PUT WRITE ENABLE HERE LATER 
 -- AND JUMP ADDRESS HERE 
 

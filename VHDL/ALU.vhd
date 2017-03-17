@@ -91,9 +91,9 @@ case SEL is
 	end if;	
  
  when "10100" => -- lw
- out_alu <= input_b;
+ out_alu<= std_logic_vector(to_unsigned(to_integer (unsigned(input_a)) +   to_integer (unsigned(input_b)), out_alu'length)) ; 
  when "10101" => -- sw
-	out_alu <= input_b;
+	out_alu<= std_logic_vector(to_unsigned(to_integer (unsigned(input_a)) +   to_integer (unsigned(input_b)), out_alu'length)) ; 
  
  when "10110" => -- beq
  out_alu<= std_logic_vector(to_unsigned(to_integer (unsigned(input_a)) +   to_integer (unsigned(input_b)), out_alu'length));
