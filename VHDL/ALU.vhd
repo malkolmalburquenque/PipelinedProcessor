@@ -11,7 +11,9 @@ end alu;
  
 architecture Behavioral of alu is
 
-signal shift : std_logic_vector (31 downto 0);
+signal shift, hi, lo, mul_result, div_result, div_rem  : std_logic_vector (31 downto 0);
+
+variable hilo_buffer : std_logic_vector(63 downto 0);
 
 begin
 process(input_a, input_b, SEL) 	
@@ -28,23 +30,31 @@ case SEL is
   out_alu<= std_logic_vector(to_unsigned(to_integer (unsigned(input_a)) +   to_integer (unsigned(input_b)), out_alu'length)) ; --ADDI
  
  when "00011" => 
- out_alu<= std_logic_vector(to_unsigned(to_integer (unsigned(input_a)) *   to_integer (unsigned(input_b)), out_alu'length)); --MULT
+ mul_result<= std_logic_vector(to_unsigned(to_integer (unsigned(input_a)) *   to_integer (unsigned(input_b)), out_alu'length)); --MULT
+ hilo_buffer<= std_logic_vector(to_unsigned(mul_result, 64));
+ hi<= hilo_buffer(63 downto 32);
+ lo<= hilo_buffer(31 downto 0);
+ out_alu<= mul_result;
  
  when "00100" =>  
- out_alu<= std_logic_vector(to_unsigned(to_integer (unsigned(input_a)) /   to_integer (unsigned(input_b)), out_alu'length));   --DIV
+ div_result <= std_logic_vector(to_unsigned(to_integer (unsigned(input_a)) /   to_integer (unsigned(input_b)), div_result'length));   --DIV
+ div_rem <= std_logic_vector(div_result mod to_unsigned(to_integer (unsigned(input_b)), div_rem'length));
+ lo <= std_logic_vector(to_unsigned(div_result, div_result'length));
+ hi <= std_logic_vector(to_unsigned(div_rem, div_rem'length));
+ out_alu <= div_result;
 
  when "00101" =>  
  if (unsigned(input_a) < unsigned(input_b)) then  --SLT
 	out_alu <= x"00000001";
 	else
-	out_alu <= x"00000001";
+	out_alu <= x"00000000";
  end if;
  
  when "00110" => 
   if (unsigned(input_a) < unsigned(input_b)) then  --SLTI
 	out_alu <= x"00000001";
 	else
-	out_alu <= x"00000001";
+	out_alu <= x"00000000";
  end if;
  
  when "00111" => 
@@ -69,9 +79,10 @@ case SEL is
  out_alu<= input_a xor input_b; --xORI
  
  when "01110" => --MOVE FROM HIGH
- 
+ out_alu<= hi;
 
  when "01111" => -- MOVE FROM LOW
+ out_alu<= lo;
  
  when "10000" => -- LUI
 	out_alu <= input_b (15 downto 0)  & std_logic_vector(to_unsigned(0, 16));
