@@ -32,6 +32,8 @@ component controller is
 	port(clk : in std_logic;
 		 opcode : in std_logic_vector(5 downto 0);
 		 funct : in std_logic_vector(5 downto 0);
+		 branch: in std_logic;
+		 oldBranch: in std_logic;
 		 ALU1src : out STD_LOGIC;
 		 ALU2src : out STD_LOGIC;
 		 MemRead : out STD_LOGIC;
@@ -238,6 +240,8 @@ port map(
 	clk => clk,
 	opcode => opcodeInput, 
 	funct => functInput,
+	branch => zeroOutput,
+	oldBranch => EXMEMBranch,
 	ALU1src => ALU1srcO,
 	ALU2src => ALU2srcO,
 	MemRead => MemReadO,
