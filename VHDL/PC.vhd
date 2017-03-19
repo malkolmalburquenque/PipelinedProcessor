@@ -6,7 +6,7 @@ entity pc is
 port(clk : in std_logic;
 	 reset : in std_logic;
 	 counterOutput : out std_logic_vector(31 downto 0);
-	 counterInput : in std_logic_vector(31 downto 0)
+	 counterInput : in std_logic_vector(31 downto 0) := x"00000000"
 	 );
 end pc;
 

@@ -23,8 +23,9 @@ component instructionFetchStage IS
 		muxInput0 : in std_logic_vector(31 downto 0);
 		selectInputs : in std_logic;
 		four : in INTEGER;
+		structuralStall : IN STD_LOGIC;
+		pcStall : IN STD_LOGIC;
 
-		
 		selectOutput : out std_logic_vector(31 downto 0);
 		instructionMemoryOutput : out std_logic_vector(31 downto 0)
 		);
@@ -46,6 +47,7 @@ component controller is
 		 RType : out std_logic;
 		 JType : out std_logic;
 		 Shift : out std_logic;
+		 structuralStall : out std_logic;
 		 ALUOp : out STD_LOGIC_VECTOR(4 downto 0)
 		 );
 end component;
@@ -166,6 +168,12 @@ port (ctrl_memtoreg_in: in std_logic;
 );
  end component;
 
+ 
+ -- STALL SIGNALS 
+signal IDEXStructuralStall : std_logic;
+signal EXMEMStructuralStall : std_logic;
+signal structuralStall : std_logic;
+signal pcStall : std_logic;
 -- TEST SIGNALS 
 signal muxInput : STD_LOGIC_VECTOR(31 downto 0) := "00000000000000000000000000000000";
 signal selectInput : std_logic := '1';
@@ -240,6 +248,8 @@ port map(
 	muxInput0 => EXMEMaluOutput,
 	selectInputs => EXMEMBranch,
 	four => fourInt,
+	structuralStall => structuralStall,
+	pcStall => pcStall,
 	selectOutput => address,
 	instructionMemoryOutput => instruction
 );
@@ -257,10 +267,12 @@ port map(
 	MemWrite => MemWriteO,
 	RegWrite => RegWriteO,
 	MemToReg => MemToRegO,
+	structuralStall => IDEXStructuralStall,
 	ALUOp => ALUOp,
 	Shift => Shift,
 	RType => RType,
 	JType => JType
+	
 );
 
 RegisterFile : register_file
@@ -368,6 +380,16 @@ port map (ctrl_memtoreg_in => memtoReg,
 	write_addr_out => WBrd
 );
 
+process(EXMEMStructuralStall)
+begin
+if EXMEMStructuralStall = '1' then 
+	pcStall <= '1';
+else 
+	pcStall <= '0';
+end if;
+
+end process;
+
 process (clk)
 begin
 
@@ -422,7 +444,8 @@ EXMEMMeMWriteO <= IDEXMeMWriteO;
 EXMEMRegWriteO <= IDEXRegWriteO;
 EXMEMMemToRegO <= IDEXMemToRegO;
 EXMEMaluOutput <= aluOutput;
-
+EXMEMStructuralStall <= IDEXStructuralStall;
+structuralStall <= EXMEMStructuralStall;
 --FOR JAL
 if IDEXAluOp = "11010" then
 	EXMEMregisterOutput <= IDEXaddress;

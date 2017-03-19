@@ -17,6 +17,7 @@ port(clk : in std_logic;
 	 RType: out STD_LOGIC;
 	 JType: out STD_LOGIC;
 	 Shift: out STD_LOGIC;
+	 structuralStall : out STD_LOGIC;
 	 ALUOp : out STD_LOGIC_VECTOR(4 downto 0)
 	 );
 end controller;
@@ -40,6 +41,7 @@ begin
 		RType <= '1';
 		Shift <= '0';
 		JType <= '0';
+		structuralStall <= '0';
 	else
 	
 	
@@ -58,6 +60,7 @@ begin
 		RType <= '1';
 		Shift <= '1';
 		JType <= '0';
+		structuralStall <= '0';
 		
 		--SUB OUTPUT 1
 		elsif funct  = "100010" then
@@ -71,6 +74,7 @@ begin
 		RType <= '1';
 		Shift <= '0';
 		JType <= '0';
+		structuralStall <= '0';
 		
 		--XOR OUTPUT 10
 		elsif funct = "101000" then
@@ -83,6 +87,7 @@ begin
 		ALUOp <= "01010"; 
 		RType <= '1';
 		Shift <= '0';
+		structuralStall <= '0';
 		
 		--AND OUTPUT 7
 		elsif funct =  "100100" then
@@ -96,6 +101,7 @@ begin
 		RType <= '1';
 		Shift <= '0';
 		JType <= '0';
+		structuralStall <= '0';
 		
 		--ADD	OUTPUT 0
 		elsif funct = "100000" then
@@ -109,6 +115,7 @@ begin
 		RType <= '1';
 		Shift <= '0';
 		JType <= '0';
+		structuralStall <= '0';
 		
 		--SLT OUTPUT 5
 		elsif funct  = "101010" then
@@ -122,6 +129,7 @@ begin
 		RType <= '1';
 		Shift <= '0';
 		JType <= '0';
+		structuralStall <= '0';
 		
 		--SRL PADED BY SIGN EXTEND   OUTPUT 18
 		elsif funct = "000010" then 
@@ -135,6 +143,7 @@ begin
 		RType <= '1';
 		Shift <= '1';
 		JType <= '0';
+		structuralStall <= '0';
 		
 			--OR OUTPUT 8
 		elsif funct = "100101" then
@@ -148,7 +157,7 @@ begin
 		RType <= '1';
 		Shift <= '0';
 		JType <= '0';
-		
+		structuralStall <= '0';
 		
 			--NOR OUTPUT 9
 		elsif funct =  "100111" then 
@@ -162,6 +171,7 @@ begin
 		RType <= '1';
 		Shift <= '0';
 		JType <= '0';
+		structuralStall <= '0';
 		
 		--JUMP REGISTER OUTPUT 25
 		elsif funct = "001000" then 
@@ -175,6 +185,7 @@ begin
 		RType <= '1';
 		Shift <= '0';
 		JType <= '1';
+		structuralStall <= '0';
 		
 		-- DIVIDING OUTPUT 4
 		elsif funct = "011010" then
@@ -188,6 +199,7 @@ begin
 		RType <= '1';
 		Shift <= '0';
 		JType <= '0';
+		structuralStall <= '0';
 		
 		-- MULT	OUTPUT 3
 		elsif funct = "011000" then
@@ -201,6 +213,7 @@ begin
 		RType <= '1';
 		Shift <= '0';
 		JType <= '0';
+		structuralStall <= '0';
 		
 		--SRA OUTPUT 18
 		elsif funct = "000011" then 
@@ -213,6 +226,7 @@ begin
 		ALUOp <= "10010";
 		RType <= '1';
 		JType <= '0';
+		structuralStall <= '0';
 		
 		-- TO DO HIGH OUTPUT 14
 		elsif funct = "001010" then
@@ -226,6 +240,7 @@ begin
 		RType <= '1';
 		Shift <= '1';
 		JType <= '0';
+		structuralStall <= '0';
 		
 		--TO DO LOW  OUTPUT 15
 		elsif funct = "001100" then 
@@ -239,6 +254,7 @@ begin
 		RType <= '1';
 		Shift <= '0';
 		JType <= '0';
+		structuralStall <= '0';
 		
 		end if;
 		
@@ -254,6 +270,7 @@ begin
 		RType <= '0';
 		Shift <= '0';
 		JType <= '0';
+		structuralStall <= '0';
 			
 		--SLTI OUTPUT 6
 		when "001010" => 
@@ -267,6 +284,7 @@ begin
 		RType <= '0';
 		Shift <= '0';
 		JType <= '0';
+		structuralStall <= '0';
 		
 		--ANDI OUTPUT 11
 		when "001100" => 
@@ -280,6 +298,7 @@ begin
 		RType <= '0';
 		Shift <= '0';
 		JType <= '0';
+		structuralStall <= '0';
 		
 		--ORI OUTPUT 12
 		
@@ -294,6 +313,7 @@ begin
 		RType <= '0';
 		Shift <= '0';
 		JType <= '0';
+		structuralStall <= '0';
 		
 		--XORI OUTPUT 13
 		
@@ -308,6 +328,7 @@ begin
 		RType <= '0';
 		Shift <= '0';
 		JType <= '0';
+		structuralStall <= '0';
 		
 		--LUI OUTPUT 16
 		
@@ -322,6 +343,7 @@ begin
 		RType <= '0';
 		Shift <= '0';
 		JType <= '0';
+		structuralStall <= '0';
 
 		
 		-- LW OUTPUT 20
@@ -336,6 +358,7 @@ begin
 		RType <= '0';
 		Shift <= '0';
 		JType <= '0';
+		structuralStall <= '1';
 		
 		-- Store  OUTPUT 21
 		
@@ -350,6 +373,7 @@ begin
 		RType <= '0';
 		Shift <= '0';
 		JType <= '0';
+		structuralStall <= '0';
 		
 		-- BEQ	OUTPUT 22
 		when "000100" => 
@@ -363,6 +387,7 @@ begin
 		RType <= '0';
 		Shift <= '0';
 		JType <= '0';
+		structuralStall <= '0';
 		
 		--BNE	OUTPUT 23
 		
@@ -377,6 +402,7 @@ begin
 		RType <= '0';
 		Shift <= '0';
 		JType <= '0';
+		structuralStall <= '0';
 		
 		-- JUMP OUTPUT 24 
 		
@@ -390,7 +416,8 @@ begin
 		ALUOp <= "11000";
 		RType <= '0';
 		Shift <= '0';
-		JType <= '1';		
+		JType <= '1';	
+		structuralStall <= '0';
 		
 		-- JUMP AND LINK  OUTPUT 26
 		when "000011" => 
@@ -404,6 +431,7 @@ begin
 		RType <= '0';
 		Shift <= '0';
 		JType <= '1';
+		structuralStall <= '0';
 		
 		when others =>
 		

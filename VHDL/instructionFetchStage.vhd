@@ -13,7 +13,9 @@ port(
 	muxInput0 : in std_logic_vector(31 downto 0);
 	selectInputs : in std_logic;
 	four : in INTEGER;
-	 
+	structuralStall : IN STD_LOGIC := '0';
+	pcStall : IN STD_LOGIC := '0';
+	
 	selectOutput : out std_logic_vector(31 downto 0);
 	instructionMemoryOutput : out std_logic_vector(31 downto 0)
 	);
@@ -88,11 +90,12 @@ end component;
 	signal internal_selectOutput : STD_LOGIC_VECTOR(31 DOWNTO 0);
 	signal addOutput : STD_LOGIC_VECTOR(31 DOWNTO 0);
 		
-	--FAKE SIGNALS 
-	signal muxInput1 : STD_LOGIC_VECTOR(31 DOWNTO 0):="00000000000000000000000000000000";
+	--SIGNAL FOR STALLS 
+	signal stallValue : STD_LOGIC_VECTOR(31 DOWNTO 0) := "00000000000000000000000000100000";
+	signal memoryValue : STD_LOGIC_VECTOR(31 DOWNTO 0);
+	signal pcInput : STD_LOGIC_VECTOR(31 DOWNTO 0);
 	
 begin
-
 
 selectOutput <= internal_selectOutput;
 address <= to_integer(unsigned(addOutput(9 downto 0)))/4;
@@ -103,7 +106,7 @@ port map(
 	clk => clk,
 	reset => rst,
 	counterOutput => pcOutput,
-	counterInput => internal_selectOutput
+	counterInput => pcInput
 );
 
 add : adder
@@ -122,6 +125,22 @@ port map(
 	 selectOutput => internal_selectOutput
 	 );
 	 
+structuralMux : mux 
+port map (
+input0 => memoryValue,
+input1 => stallValue,
+selectInput => structuralStall,
+selectOutput => instructionMemoryOutput
+);
+
+pcMux : mux 
+port map (
+input0 => internal_selectOutput,
+input1 => pcOutput,
+selectInput => pcStall,
+selectOutput => pcInput
+);
+	 
 iMem : instructionMemory
 	GENERIC MAP(
             ram_size => 1024
@@ -132,7 +151,7 @@ iMem : instructionMemory
                     address,
                     memwrite,
                     memread,
-                    instructionMemoryOutput,
+                    memoryValue,
                     waitrequest
                 );
 				
