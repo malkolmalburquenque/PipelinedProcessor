@@ -7,7 +7,9 @@ port
 (
 clk : in std_logic;
 reset : in std_logic;
-four : INTEGER
+four : INTEGER;
+writeToRegisterFile : in std_logic := '0';
+writeToMemoryFile : in std_logic := '0'
 
 );
 
@@ -21,6 +23,7 @@ component instructionFetchStage IS
 		muxInput0 : in std_logic_vector(31 downto 0);
 		selectInputs : in std_logic;
 		four : in INTEGER;
+
 		
 		selectOutput : out std_logic_vector(31 downto 0);
 		instructionMemoryOutput : out std_logic_vector(31 downto 0)
@@ -57,6 +60,7 @@ PORT(
 		write_enable: IN STD_LOGIC; 
 		rd: IN STD_LOGIC_VECTOR (4 downto 0);
 		rd_data: IN STD_LOGIC_VECTOR (31 downto 0); 
+		writeToText : IN STD_LOGIC := '0';
 
 		ra_data: OUT STD_LOGIC_VECTOR (31 downto 0);
 		rb_data: OUT STD_LOGIC_VECTOR (31 downto 0) 
@@ -111,6 +115,8 @@ COMPONENT memory IS
 		address: IN INTEGER RANGE 0 TO ram_size-1;
 		memwrite: IN STD_LOGIC := '0';
 		memread: IN STD_LOGIC := '0';
+		writeToText : IN STD_LOGIC := '0';
+		
 		readdata: OUT STD_LOGIC_VECTOR (31 DOWNTO 0);
 		waitrequest: OUT STD_LOGIC
 	);
@@ -265,6 +271,7 @@ port map (
 	write_enable => write_enable,
 	rd => WBrd,
 	rd_data => rd_data,
+	writeToText => writeToRegisterFile,
 	ra_data => ra,
 	rb_data => rb
 );
@@ -344,6 +351,7 @@ port map (
 	address => MEMaddress,
 	memwrite => MEMmemwrite,
 	memread  => MEMmemread,
+	writeToText => writeToMemoryFile,
 	readdata => MEMreaddata,
 	waitrequest => MEMwaitrequest
 );

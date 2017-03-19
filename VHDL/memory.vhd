@@ -2,6 +2,8 @@
 LIBRARY ieee;
 USE ieee.std_logic_1164.all;
 USE ieee.numeric_std.all;
+use std.textio.all;
+use ieee.std_logic_textio.all;
 
 ENTITY memory IS
 	GENERIC(
@@ -15,6 +17,8 @@ ENTITY memory IS
 		address: IN INTEGER RANGE 0 TO ram_size-1;
 		memwrite: IN STD_LOGIC;
 		memread: IN STD_LOGIC;
+		writeToText : IN STD_LOGIC;
+		
 		readdata: OUT STD_LOGIC_VECTOR (31 DOWNTO 0);
 		waitrequest: OUT STD_LOGIC
 	);
@@ -27,6 +31,24 @@ ARCHITECTURE rtl OF memory IS
 	SIGNAL write_waitreq_reg: STD_LOGIC := '1';
 	SIGNAL read_waitreq_reg: STD_LOGIC := '1';
 BEGIN
+
+	process(writeToText)
+			file memoryFile : text open write_mode is "memory.txt";
+			variable outLine : line;	
+			variable rowLine : integer := 0;
+
+			begin
+			if writeToText = '1' then
+			
+			while (rowLine < 8192) loop 
+			
+				write(outLine, ram_block(rowLine));
+				writeline(memoryFile, outLine);
+				rowLine := rowLine + 1;
+				
+			end loop;
+		end if;	
+		end process;
 	--This is the main section of the SRAM model
 	mem_process: PROCESS (clock)
 	BEGIN

@@ -12,7 +12,9 @@ port
 (
 clk : in std_logic;
 reset : in std_logic;
-four : INTEGER
+four : INTEGER;
+writeToRegisterFile : in std_logic;
+writeToMemoryFile : in std_logic
 
 );
 end component;
@@ -21,6 +23,8 @@ constant clk_period : time := 1 ns;
 signal clk : std_logic := '0';
 signal rst : std_logic := '0';
 signal fourInt : INTEGER := 4;
+signal writeToRegisterFile : std_logic := '0';
+signal writeToMemoryFile : std_logic := '0';
 
 begin 
 
@@ -29,10 +33,11 @@ pipeline : cpuPipeline
 port map(
 clk => clk,
 reset => rst,
-four => fourInt
+four => fourInt,
+writeToMemoryFile => writeToRegisterFile,
+writeToRegisterFile => writeToMemoryFile
 );
 
-		
 clk_process : process
     BEGIN
         clk <= '0';
@@ -45,14 +50,10 @@ test_process : process
     BEGIN
         wait for clk_period;
         report "STARTING SIMULATION \n";
-		wait for clk_period;
-		wait for clk_period;
-		wait for clk_period;
-		wait for clk_period;
-		wait for clk_period;
-		wait for clk_period;
-		wait for clk_period;
-		wait for clk_period;
+		wait for  10000* clk_period;
+		writeToRegisterFile <= '1';
+		writeToMemoryFile <= '1';
+		
 		wait;
 		
 end process;
