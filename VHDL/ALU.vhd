@@ -96,17 +96,17 @@ case SEL is
 	out_alu<= std_logic_vector(to_unsigned(to_integer (unsigned(input_a)) +   to_integer (unsigned(input_b)), out_alu'length)) ; 
  
  when "10110" => -- beq
- out_alu<= std_logic_vector(to_unsigned(to_integer ((unsigned(input_a)) +   to_integer (unsigned(input_b)) * 4), out_alu'length));
+ out_alu<= std_logic_vector(to_unsigned((to_integer (unsigned(input_a)) +   to_integer (unsigned(input_b)) * 4), out_alu'length));
  
  when "10111" => -- bne
- out_alu<= std_logic_vector(to_unsigned(to_integer ((unsigned(input_a)) +   to_integer (unsigned(input_b)) * 4), out_alu'length));
+ out_alu<= std_logic_vector(to_unsigned((to_integer (unsigned(input_a)) +   to_integer (unsigned(input_b)) * 4), out_alu'length));
  
  when "11000" => -- j ASSUME input b is lower 26 bits 0 padded
-	out_alu<= input_a(31 downto 28) & input_b(27 downto 0);
+	out_alu<= input_a(31 downto 28) & input_b(25 downto 0) & "00";
  when "11001" => -- jr
-	out_alu<= input_a(31 downto 28) & input_b(27 downto 0);
+	out_alu <= input_a;
  when "11010" => -- jal
-	out_alu<= input_a(31 downto 28) & input_b(27 downto 0);
+	out_alu<= input_a(31 downto 28) & input_b(25 downto 0) & "00";
  when others =>
   NULL;
 end case; 

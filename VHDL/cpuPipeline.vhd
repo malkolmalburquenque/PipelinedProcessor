@@ -41,6 +41,7 @@ component controller is
 		 RegWrite : out STD_LOGIC;
 		 MemToReg : out STD_LOGIC;
 		 RType : out std_logic;
+		 JType : out std_logic;
 		 Shift : out std_logic;
 		 ALUOp : out STD_LOGIC_VECTOR(4 downto 0)
 		 );
@@ -125,6 +126,7 @@ port (clk: in std_logic;
 	ctrl_memtoreg_out: out std_logic;
 	ctrl_regwrite_in: in std_logic;
 	ctrl_regwrite_out: out std_logic;
+	ctrl_jal: in std_logic;
 
 	--Ports of stage
 	alu_in : in std_logic_vector (31 downto 0);
@@ -183,7 +185,7 @@ signal IDEXAluOp : std_logic_vector (4 downto 0);
 
 -- SIGNALS FOR CONTROLLER
 signal opcodeInput,functInput : std_logic_vector(5 downto 0);
-signal ALU1srcO,ALU2srcO,MemReadO,MemWriteO,RegWriteO,MemToRegO,RType,Shift: std_logic;
+signal ALU1srcO,ALU2srcO,MemReadO,MemWriteO,RegWriteO,MemToRegO,RType,Jtype,Shift: std_logic;
 signal ALUOp : std_logic_vector(4 downto 0);
 
 -- SIGNALS FOR REGISTERS
@@ -204,6 +206,7 @@ signal zeroOutput : std_logic;
 
 -- SIGNALS FOR EXMEM
 signal EXMEMBranch : std_logic; -- need the zero variable 
+signal ctrl_jal : std_logic;
 signal EXMEMaluOutput : std_logic_vector(31 downto 0);
 signal EXMEMregisterOutput : std_logic_vector(31 downto 0);
 signal EXMEMrd : std_logic_vector(4 downto 0);
@@ -250,7 +253,8 @@ port map(
 	MemToReg => MemToRegO,
 	ALUOp => ALUOp,
 	Shift => Shift,
-	RType => RType
+	RType => RType,
+	JType => JType
 );
 
 RegisterFile : register_file
@@ -314,6 +318,7 @@ port map (
 	ctrl_memtoreg_out => memtoReg,
 	ctrl_regwrite_in => EXMEMRegWriteO,
 	ctrl_regwrite_out => regWrite,
+	ctrl_jal => ctrl_jal,
 
 	--Ports of stage
 	alu_in => EXMEMaluOutput,
@@ -371,6 +376,9 @@ IDEXrb <= rb;
 --FOR IMMEDIATE VALUES
 if RType = '1' then
 	IDEXrd <= rd;
+-- FOR JAL
+elsif ALUOP = "11010" then
+	IDEXrd <= "11111";
 else
 	IDEXrd <= rt;
 end if;
@@ -382,7 +390,13 @@ else
 	IDEXra <= ra;
 end if;
 
-IDEXimmediate <= immediate_out;
+--FOR JUMP INSTRUCTIONS
+if JType = '1' then
+	IDEXimmediate <= "000000" & IFIDinstruction(25 downto 0);
+else
+	IDEXimmediate <= immediate_out;
+end if;
+
 IDEXALU1srcO <= ALU1srcO;
 IDEXALU2srcO <= ALU2srcO;
 IDEXMemReadO <= MemReadO;
@@ -390,17 +404,26 @@ IDEXMeMWriteO <= MemWriteO;
 IDEXRegWriteO <= RegWriteO;
 IDEXMemToRegO <= MemToRegO;
 IDEXAluOp <= ALUOp;
+
 	
 --EXMEM 
 EXMEMBranch <= zeroOutput; 
-EXMEMaluOutput <= aluOutput;
-EXMEMregisterOutput <= IDEXrb;
 EXMEMrd <= IDEXrd;
 EXMEMMemReadO <= IDEXMemReadO;
 EXMEMMeMWriteO <= IDEXMeMWriteO;
 EXMEMRegWriteO <= IDEXRegWriteO;
 EXMEMMemToRegO <= IDEXMemToRegO;
+EXMEMaluOutput <= aluOutput;
 
+--FOR JAL
+if IDEXAluOp = "11010" then
+	EXMEMregisterOutput <= IDEXaddress;
+	ctrl_jal <= '1';
+else
+	EXMEMregisterOutput <= IDEXrb;
+	ctrl_jal <= '0';
+end if;
+	
 end if ;
 end process;
 

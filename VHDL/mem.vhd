@@ -16,7 +16,8 @@ port (clk: in std_logic;
 	ctrl_memtoreg_out: out std_logic;
 	ctrl_regwrite_in: in std_logic;
 	ctrl_regwrite_out: out std_logic;
-
+	ctrl_jal: in std_logic;
+		
 	--Ports of stage
 	alu_in : in std_logic_vector (31 downto 0);
 	alu_out : out std_logic_vector (31 downto 0);
@@ -39,7 +40,7 @@ end mem;
 architecture behavioral of mem is
 
 
-signal mem_data_next, alu_next: std_logic_vector (31 downto 0);
+signal mem_data_next, alu_next, address_next: std_logic_vector (31 downto 0);
 signal write_addr_next: std_logic_vector (4 downto 0);
 signal ctrl_memtoreg_next, ctrl_regwrite_next: std_logic;
 			
@@ -69,7 +70,13 @@ begin
 	write_addr_next <= write_addr_in;
 	ctrl_memtoreg_next <= ctrl_memtoreg_in;
 	ctrl_regwrite_next <= ctrl_regwrite_in;
-	alu_next <= alu_in;
+	
+	--FOR JAL
+	if ctrl_jal = '1' then
+		alu_next <= mem_data_in;
+	else
+		alu_next <= alu_in;
+	end if;
 
 	--Access memory
 	
