@@ -23,7 +23,7 @@ ARCHITECTURE behav of alu_tb IS
 	SIGNAL out_alu : STD_LOGIC_VECTOR (31 downto 0);
 
 BEGIN
-	alutest : alu	
+	alutest : alu
 	PORT MAP(
 		input_a => input_a,
 		input_b => input_b,
@@ -60,35 +60,59 @@ BEGIN
 		input_b <= "00000000000000000000000100000000";
 		sel <= "10001";
 		wait for clock_period;
-		
+
 		--MUL1
 		input_a <= "00000000000000000000000000000100";
 		input_b <= "00000000000000000000001000000000";
 		sel <= "00011";
 		wait for clock_period;
-		
+
+		--MFHI
+		sel <= "01110";
+		wait for clock_period;
+
+		--MFLO
+		sel <= "01111";
+		wait for clock_period;
+
 		--MUL2
 		input_a <= "10000000000000000000000000000000";
 		input_b <= "00000000010000000000000000000000";
 		sel <= "00011";
 		wait for clock_period;
-		
+
+		--MFHI
+		sel <= "01110";
+		wait for clock_period;
+
+		--MFLO
+		sel <= "01111";
+		wait for clock_period;
+
 		--DIV1
 		input_a <= "00000000000000000000000000001000";
 		input_b <= "00000000000000000000000000000010";
 		sel <= "00100";
 		wait for clock_period;
-		
+
+		--MFHI
+		sel <= "01110";
+		wait for clock_period;
+
+		--MFLO
+		sel <= "01111";
+		wait for clock_period;
+
 		--DIV2
 		input_a <= "00000000000000000000000000001000";
 		input_a <= "00000000000000000000000000000011";
 		sel <= "00100";
 		wait for clock_period;
-		
+
 		--MFHI
 		sel <= "01110";
 		wait for clock_period;
-		
+
 		--MFLO
 		sel <= "01111";
 		wait for clock_period;
