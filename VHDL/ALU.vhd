@@ -13,10 +13,9 @@ architecture Behavioral of alu is
 
 signal shift, hi, lo, mul_result, div_result, div_rem  : std_logic_vector (31 downto 0);
 
-variable hilo_buffer : std_logic_vector(63 downto 0);
-
 begin
 process(input_a, input_b, SEL) 	
+variable hilo_buffer : std_logic_vector(63 downto 0);
 begin
 case SEL is
  
@@ -31,14 +30,14 @@ case SEL is
  
  when "00011" => 
  mul_result<= std_logic_vector(to_unsigned(to_integer (unsigned(input_a)) *   to_integer (unsigned(input_b)), out_alu'length)); --MULT
- hilo_buffer<= std_logic_vector(to_unsigned(mul_result, 64));
+ hilo_buffer<= std_logic_vector(to_unsigned(to_integer(unsigned(mul_result), 64)));
  hi<= hilo_buffer(63 downto 32);
  lo<= hilo_buffer(31 downto 0);
  out_alu<= mul_result;
  
  when "00100" =>  
  div_result <= std_logic_vector(to_unsigned(to_integer (unsigned(input_a)) /   to_integer (unsigned(input_b)), div_result'length));   --DIV
- div_rem <= std_logic_vector(div_result mod to_unsigned(to_integer (unsigned(input_b)), div_rem'length));
+ div_rem <= std_logic_vector(to_unsigned(to_integer (unsigned(input_a)) mod to_integer (unsigned(input_b)), div_rem'length));
  lo <= std_logic_vector(to_unsigned(div_result, div_result'length));
  hi <= std_logic_vector(to_unsigned(div_rem, div_rem'length));
  out_alu <= div_result;
