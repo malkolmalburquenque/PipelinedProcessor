@@ -15,7 +15,6 @@ signal shift, hi, lo, mul_result, div_result, div_rem  : std_logic_vector (31 do
 
 begin
 process(input_a, input_b, SEL) 	
-variable hilo_buffer : std_logic_vector(63 downto 0);
 begin
 case SEL is
  
@@ -29,10 +28,9 @@ case SEL is
   out_alu<= std_logic_vector(to_unsigned(to_integer (unsigned(input_a)) +   to_integer (unsigned(input_b)), out_alu'length)) ; --ADDI
  
  when "00011" => 
- mul_result<= std_logic_vector(to_unsigned(to_integer (unsigned(input_a)) *   to_integer (unsigned(input_b)), out_alu'length)); --MULT
- hilo_buffer := std_logic_vector(to_unsigned(to_integer (unsigned(input_a)) *   to_integer (unsigned(input_b)), 64));
- hi<= hilo_buffer(63 downto 32);
- lo<= hilo_buffer(31 downto 0);
+ hi<= std_logic_vector(to_unsigned(to_integer (unsigned(input_a)) *   to_integer (unsigned(input_b)), 64))(63 downto 32);
+ lo<= std_logic_vector(to_unsigned(to_integer (unsigned(input_a)) *   to_integer (unsigned(input_b)), 64))(31 downto 0);
+ mul_result <= std_logic_vector(to_unsigned(to_integer (unsigned(input_a)) *   to_integer (unsigned(input_b)), 32));
  out_alu<= mul_result;
  
  when "00100" =>  
