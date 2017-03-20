@@ -30,7 +30,7 @@ case SEL is
  
  when "00011" => 
  mul_result<= std_logic_vector(to_unsigned(to_integer (unsigned(input_a)) *   to_integer (unsigned(input_b)), out_alu'length)); --MULT
- hilo_buffer<= std_logic_vector(to_unsigned(to_integer(unsigned(mul_result), 64)));
+ hilo_buffer := std_logic_vector(to_unsigned(to_integer (unsigned(input_a)) *   to_integer (unsigned(input_b)), 64));
  hi<= hilo_buffer(63 downto 32);
  lo<= hilo_buffer(31 downto 0);
  out_alu<= mul_result;
@@ -38,8 +38,8 @@ case SEL is
  when "00100" =>  
  div_result <= std_logic_vector(to_unsigned(to_integer (unsigned(input_a)) /   to_integer (unsigned(input_b)), div_result'length));   --DIV
  div_rem <= std_logic_vector(to_unsigned(to_integer (unsigned(input_a)) mod to_integer (unsigned(input_b)), div_rem'length));
- lo <= std_logic_vector(to_unsigned(div_result, div_result'length));
- hi <= std_logic_vector(to_unsigned(div_rem, div_rem'length));
+ lo <= div_result;
+ hi <= div_rem;
  out_alu <= div_result;
 
  when "00101" =>  
